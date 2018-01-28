@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MatchUp</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="button1">Connect to Facebook</string>
+
+    <string name="facebook_app_id">1817047488594713</string>
+    <string name="fb_login_protocol_scheme">fb1817047488594713</string>
+</resources>
