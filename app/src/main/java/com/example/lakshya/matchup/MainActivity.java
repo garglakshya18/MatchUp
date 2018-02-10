@@ -26,15 +26,24 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -90,7 +99,7 @@ public class MainActivity extends AppCompatActivity
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        // App code
+                        getFriendsList();
                     }
 
                     @Override
@@ -107,6 +116,41 @@ public class MainActivity extends AppCompatActivity
         LoginManager.getInstance().logInWithReadPermissions(this, Collections.singletonList("public_profile"));
     }
 
+    private List<String> getFriendsList() {
+        final List<String> friendslist = new ArrayList<String>();
+        new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/taggable_friends", null, HttpMethod.GET, new GraphRequest.Callback() {
+            @Override
+            public void onCompleted(GraphResponse response) {
+                /* handle the result */
+                Log.e("Friend List 1: ", response.toString());
+                try {
+                    JSONObject responseObject = response.getJSONObject();
+                    JSONArray dataArray = responseObject.getJSONArray("data");
+
+                    for (int i = 0; i < dataArray.length(); i++) {
+                        JSONObject dataObject = dataArray.getJSONObject(i);
+                        String fbId = dataObject.getString("id");
+                        String fbName = dataObject.getString("name");
+                        Log.e("FbId", fbId);
+                        Log.e("FbName", fbName);
+                        friendslist.add(fbName);
+                    }
+                    Log.e("fbfriendlist", friendslist.toString());
+                    List<String> list = friendslist;
+                    String friends = "";
+                    if (list.size() > 0) {
+                        friends = list.toString();
+                        if (friends.contains("[")) {
+                            friends = (friends.substring(1, friends.length() - 1));
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).executeAsync();
+        return friendslist;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
